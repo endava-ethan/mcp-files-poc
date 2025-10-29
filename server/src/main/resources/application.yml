@@ -1,0 +1,5 @@
+app:
+  baseDir: ${user.home}/mcp-play
+transport:
+  tcp:
+    port: 7071
