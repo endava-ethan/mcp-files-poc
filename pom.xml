@@ -4,80 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.poc</groupId>
   <artifactId>mcp-files-poc</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>transport-common</module>
     <module>server</module>
-    <module>client</module>
   </modules>
-
-  <properties>
-    <java.version>25</java.version>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
-    <spring.boot.version>3.3.2</spring.boot.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.toolchain.type>jdk</maven.toolchain.type>
-    <maven.toolchain.version>${java.version}</maven.toolchain.version>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring.boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-toolchains-plugin</artifactId>
-          <version>3.2.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>toolchain</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <toolchains>
-              <toolchain>
-                <type>${maven.toolchain.type}</type>
-                <provides>
-                  <version>${maven.toolchain.version}</version>
-                </provides>
-              </toolchain>
-            </toolchains>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.13.0</version>
-          <configuration>
-            <release>${maven.compiler.release}</release>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${spring.boot.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.5.1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

@@ -1,5 +1,0 @@
-<configuration>
-  <include resource="logback.xml" />
-
-  <logger name="WIRE" level="INFO" />
-</configuration>
