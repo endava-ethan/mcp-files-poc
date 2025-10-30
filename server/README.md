@@ -1,23 +1,30 @@
-# MCP Files Server
+# STDIO MCP file server
 
-Spring Boot application that exposes three MCP tools (`list_files`, `read_text`, `write_text`) using a custom TCP transport with length-prefixed frames.
+This module contains a compact Model Context Protocol server that communicates
+using newline-delimited JSON-RPC over stdio. The implementation mimics the
+structure of the official [`modelcontextprotocol/java-sdk`](https://github.com/modelcontextprotocol/java-sdk)
+so you can later swap in the published artifact without changing the rest of
+the code.
 
-## Build & Run
+## Tools
+
+The server advertises three tools:
+
+| Tool        | Description                                              |
+|-------------|----------------------------------------------------------|
+| list_files  | List one directory level under the configured base path. |
+| read_text   | Read a UTF-8 text file.                                  |
+| write_text  | Write a UTF-8 text file, prompting before overwriting.   |
+
+All file operations are sandboxed to the base directory (defaults to
+`${user.home}/mcp-play`; override with `MCP_FILES_BASE_DIR`).
+
+## Building and running
 
 ```bash
-mvn -pl server -am -DskipTests package
-java -jar server/target/mcp-files-server.jar
+javac $(find src/main/java -name '*.java') -d target/classes
+java -cp target/classes dev.poc.files.McpFilesServer
 ```
 
-The server listens on `localhost:7071` and creates `${user.home}/mcp-play` on startup. Each TCP connection gets its own session identifier and a dedicated thread that bridges incoming MCP JSON-RPC requests to the tool handlers.
-
-### Expected log flow
-
-A successful workflow emits log lines similar to:
-
-```
-TX conn=/127.0.0.1:53462 type=response req=null corr=cli-1 final=true seq=1 json={"jsonrpc":"2.0","id":"cli-1","result":...}
-RX conn=/127.0.0.1:53462 type=request req=cli-2 corr=null final=false seq=1 json={"jsonrpc":"2.0","id":"cli-2","method":"tools/list"...}
-```
-
-During `write_text` the server pauses to send an `elicitation/create` request and waits for the client response before returning the final result with `fin=true`.
+During startup the server prints the base directory to `stderr` and then waits
+for JSON-RPC requests on `stdin`.

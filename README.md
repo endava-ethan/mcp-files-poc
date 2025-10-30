@@ -1,43 +1,54 @@
 # MCP Files PoC
 
-This repository demonstrates a minimal Model Context Protocol (MCP) proof of concept built with Java 25 and Maven. The project contains three modules:
+This repository now focuses on the simplest possible Model Context Protocol (MCP)
+server written in Java. It uses a tiny in-repo shim inspired by the
+[`modelcontextprotocol/java-sdk`](https://github.com/modelcontextprotocol/java-sdk)
+project so the code reads like an SDK-based server while remaining completely
+self-contained and buildable without network access.
 
-- `transport-common` – shared envelope/codec/logging utilities for the custom transport
-- `server` – a Spring Boot application that exposes MCP tools over a length-prefixed TCP transport
-- `client` – a console client that exercises the server end-to-end using the same transport
+The server exposes three tools:
 
-Both the client and server emit detailed WIRE logs so you can follow every JSON-RPC envelope that traverses the connection.
+- `list_files` – lists a single directory relative to the configured root
+- `read_text` – prints the contents of a UTF-8 file
+- `write_text` – writes a UTF-8 file and requests confirmation before
+  overwriting existing files via the MCP elicitation flow
 
-## Building
+## Structure
+
+- `server/` – contains the STDIO MCP server
+
+## Running
+
+The server speaks JSON-RPC 2.0 over stdio. To try it out you can pipe JSON
+requests manually or connect it to any MCP-compatible client. A minimal manual
+session looks like this:
 
 ```bash
-mvn -DskipTests package
+# Terminal 1 – start the server
+java -cp server/target/classes dev.poc.files.McpFilesServer
 ```
 
-This produces runnable JARs:
+```bash
+# Terminal 2 – drive it with your MCP client of choice
+# (for example the samples that ship with the modelcontextprotocol/java-sdk repo)
+printf '%s\n' '{"jsonrpc":"2.0","id":"1","method":"initialize"}' \
+  '{"jsonrpc":"2.0","id":"2","method":"tools/list"}' | ./path-to-client
+```
 
-- `server/target/mcp-files-server.jar`
-- `client/target/mcp-files-client.jar`
+The base directory defaults to `${user.home}/mcp-play`; override it with the
+`MCP_FILES_BASE_DIR` environment variable when launching the server.
 
-## Running the demo
+Because the project has no external dependencies you can compile it with a
+vanilla JDK:
 
-1. Start the server:
+```bash
+javac $(find server/src/main/java -name '*.java') -d server/target/classes
+java -cp server/target/classes dev.poc.files.McpFilesServer
+```
 
-   ```bash
-   java -jar server/target/mcp-files-server.jar
-   ```
+## Next steps
 
-   The server listens on TCP port `7071` and creates `${user.home}/mcp-play` as its working directory.
-
-2. In a separate terminal, drive the client workflow:
-
-   ```bash
-   java -jar client/target/mcp-files-client.jar init
-   java -jar client/target/mcp-files-client.jar list .
-   java -jar client/target/mcp-files-client.jar write notes/todo.txt "buy milk"
-   java -jar client/target/mcp-files-client.jar read notes/todo.txt
-   ```
-
-   Add `--decline` before the command if you want the client to refuse overwrite requests.
-
-During the `write` call the server issues an MCP `elicitation/create` request to confirm overwriting existing files; the client auto-accepts by default. Watch the `WIRE` logger output on both sides to see the framed JSON exchange.
+With a pure MCP baseline in place it's straightforward to extend the
+`com.modelcontextprotocol.sdk` shim or swap it out for the official SDK when
+you have network access. From there you can experiment with custom transports
+or more sophisticated tooling.
