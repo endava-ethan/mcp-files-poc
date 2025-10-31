@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 import dev.poc.files.model.FileReadResult;
 import dev.poc.files.service.FileService;
 import io.modelcontextprotocol.server.McpServerFeatures;
@@ -20,6 +22,7 @@ import io.modelcontextprotocol.spec.McpSchema;
  * Currently serves the {@code todo.md} file as a {@code text/markdown} resource.
  */
 @Component
+@RequiredArgsConstructor
 public class TodoResourceProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(TodoResourceProvider.class);
@@ -29,14 +32,6 @@ public class TodoResourceProvider {
 	private static final String TODO_RESOURCE_URI = "resource://todo.md";
 
 	private final FileService fileService;
-
-	/**
-	 * Create the resource provider backed by {@link FileService}.
-	 * @param fileService service used to read workspace files
-	 */
-	public TodoResourceProvider(FileService fileService) {
-		this.fileService = fileService;
-	}
 
 	/**
 	 * Provide the MCP resource specification for the workspace TODO markdown file.

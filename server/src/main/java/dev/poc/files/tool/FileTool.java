@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import dev.poc.files.model.DeleteResult;
 import dev.poc.files.model.DirectoryListing;
 import dev.poc.files.model.FileReadResult;
@@ -30,19 +32,12 @@ import io.modelcontextprotocol.spec.McpSchema;
  * reading files, and writing file contents relative to the configured base directory.
  */
 @Component
+@RequiredArgsConstructor
 public class FileTool {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileTool.class);
 
-private final FileService fileService;
-
-	/**
-	 * Construct the tool suite backed by the provided {@link FileService}.
-	 * @param fileService service encapsulating all file system interactions
-	 */
-	public FileTool(FileService fileService) {
-		this.fileService = fileService;
-	}
+	private final FileService fileService;
 
 	/**
 	 * Obtain the base directory used by the underlying file service.

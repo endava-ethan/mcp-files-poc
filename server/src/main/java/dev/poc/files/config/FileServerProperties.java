@@ -5,11 +5,15 @@ import java.nio.file.Paths;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration options for the file MCP server. Allows overriding the base directory
  * via Spring configuration while preserving the legacy environment variable behaviour.
  */
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "mcp.files")
 public class FileServerProperties {
 
@@ -17,22 +21,6 @@ public class FileServerProperties {
 	 * An optional explicit base directory configured via application properties.
 	 */
 	private String baseDir;
-
-	/**
-	 * Retrieve the configured base directory, if any.
-	 * @return configured base directory, or {@code null} when not explicitly set
-	 */
-	public String getBaseDir() {
-		return baseDir;
-	}
-
-	/**
-	 * Set the base directory used for file operations.
-	 * @param baseDir human-readable base directory path
-	 */
-	public void setBaseDir(String baseDir) {
-		this.baseDir = baseDir;
-	}
 
 	/**
 	 * Resolve the directory the server should operate on, preferring the configured
