@@ -1,0 +1,16 @@
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\config\FileServerProperties.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\config\McpServerConfig.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\config\McpTransportProperties.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\config\WebMvcTransportConfig.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\config\WebSocketTransportConfig.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\config\WebSocketTransportRegistration.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\FilesServerApplication.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\model\DeleteResult.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\model\DirectoryListing.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\model\FileItem.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\model\FileReadResult.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\model\WriteResult.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\resource\TodoResourceProvider.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\service\FileService.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\tool\FileTool.java
+c:\Users\echeah\Github\mcp-files-poc\server\src\main\java\dev\poc\files\transport\WebSocketMcpTransportProvider.java
