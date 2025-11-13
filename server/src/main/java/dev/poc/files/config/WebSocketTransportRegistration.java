@@ -23,16 +23,20 @@ public class WebSocketTransportRegistration implements WebSocketConfigurer {
 
 	private final McpTransportProperties transportProperties;
 
+	private final WebSocketBasicAuthInterceptor basicAuthInterceptor;
+
 	public WebSocketTransportRegistration(WebSocketMcpTransportProvider transportProvider,
-			McpTransportProperties transportProperties) {
+			McpTransportProperties transportProperties, WebSocketBasicAuthInterceptor basicAuthInterceptor) {
 		this.transportProvider = transportProvider;
 		this.transportProperties = transportProperties;
+		this.basicAuthInterceptor = basicAuthInterceptor;
 	}
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(this.transportProvider, this.transportProperties.getEndpoint()).setAllowedOrigins("*");
+		registry.addHandler(this.transportProvider, this.transportProperties.getEndpoint())
+			.addInterceptors(this.basicAuthInterceptor)
+			.setAllowedOrigins("*");
 	}
 
 }
-

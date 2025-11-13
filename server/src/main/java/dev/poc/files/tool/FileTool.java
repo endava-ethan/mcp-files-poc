@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -86,8 +85,8 @@ public class FileTool {
 	public McpServerFeatures.SyncToolSpecification writeTextTool() {
 		return McpServerFeatures.SyncToolSpecification.builder()
 			.tool(McpSchema.Tool.builder()
-				.name("write_text")
-				.title("Write text file")
+				.name("write_new_text")
+				.title("Write new text file")
 				.description(
 						"Write a UTF-8 text file. The client is prompted before overwriting existing files unless allowOverwrite is true.")
 				.inputSchema(writeTextSchema())
@@ -103,8 +102,8 @@ public class FileTool {
 	public McpServerFeatures.SyncToolSpecification deleteFileTool() {
 		return McpServerFeatures.SyncToolSpecification.builder()
 			.tool(McpSchema.Tool.builder()
-				.name("delete_file")
-				.title("Delete file")
+				.name("delete_local_file")
+				.title("Delete Local file")
 				.description("Delete a file relative to the base directory after confirmation.")
 				.inputSchema(deleteFileSchema())
 				.build())
@@ -121,8 +120,21 @@ public class FileTool {
 	 */
 	private McpSchema.CallToolResult handleListFiles(McpSyncServerExchange exchange,
 			McpSchema.CallToolRequest callToolRequest) {
-		Map<String, Object> arguments = safeArguments(callToolRequest);
-		String dir = stringArgument(arguments, "dir", ".");
+        /**
+         * Log client roots if the capability is present
+         */
+        var rootsCaps = exchange.getClientCapabilities().roots();
+        if (rootsCaps != null) {
+            McpSchema.ListRootsResult roots = exchange.listRoots();
+            roots.roots().forEach(root ->
+                    logger.info("Client root {} -> {}", root.name(), root.uri()));
+        } else {
+            logger.debug("Client {} has no roots capability", exchange.sessionId());
+        }
+
+
+		Map<String, Object> arguments = ToolRequestUtils.safeArguments(callToolRequest);
+		String dir = ToolRequestUtils.stringArgument(arguments, "dir", ".");
 		logger.debug("Handling list_files request for directory {}", dir);
 		try {
 			DirectoryListing listing = this.fileService.list(dir);
@@ -155,8 +167,8 @@ public class FileTool {
 	 */
 	private McpSchema.CallToolResult handleReadText(McpSyncServerExchange exchange,
 			McpSchema.CallToolRequest callToolRequest) {
-		Map<String, Object> arguments = safeArguments(callToolRequest);
-		String path = stringArgument(arguments, "path", null);
+		Map<String, Object> arguments = ToolRequestUtils.safeArguments(callToolRequest);
+		String path = ToolRequestUtils.stringArgument(arguments, "path", null);
 		logger.debug("Handling read_text request for path {}", path);
 		if (!StringUtils.hasText(path)) {
 			return errorResult("path argument is required", Map.of("missing", "path"));
@@ -184,10 +196,10 @@ public class FileTool {
 	 */
 	private McpSchema.CallToolResult handleWriteText(McpSyncServerExchange exchange,
 			McpSchema.CallToolRequest callToolRequest) {
-		Map<String, Object> arguments = safeArguments(callToolRequest);
-		String path = stringArgument(arguments, "path", null);
-		String content = stringArgument(arguments, "content", null);
-		boolean allowOverwrite = booleanArgument(arguments, "allowOverwrite", false);
+		Map<String, Object> arguments = ToolRequestUtils.safeArguments(callToolRequest);
+		String path = ToolRequestUtils.stringArgument(arguments, "path", null);
+		String content = ToolRequestUtils.stringArgument(arguments, "content", null);
+		boolean allowOverwrite = ToolRequestUtils.booleanArgument(arguments, "allowOverwrite", false);
 
 		logger.debug("Handling write_text request for path {} (overwrite allowed: {})", path, allowOverwrite);
 
@@ -230,8 +242,8 @@ public class FileTool {
 	 */
 	private McpSchema.CallToolResult handleDeleteFile(McpSyncServerExchange exchange,
 			McpSchema.CallToolRequest callToolRequest) {
-		Map<String, Object> arguments = safeArguments(callToolRequest);
-		String path = stringArgument(arguments, "path", null);
+		Map<String, Object> arguments = ToolRequestUtils.safeArguments(callToolRequest);
+		String path = ToolRequestUtils.stringArgument(arguments, "path", null);
 		if (!StringUtils.hasText(path)) {
 			return errorResult("path argument is required", Map.of("missing", "path"));
 		}
@@ -328,50 +340,6 @@ public class FileTool {
 		boolean accepted = Boolean.TRUE.equals(confirm);
 		logger.info("Deletion {} for {}", accepted ? "confirmed" : "declined", normalized);
 		return accepted;
-	}
-
-	/**
-	 * Safely extract the argument map, substituting an empty map when arguments are missing.
-	 * @param callToolRequest inbound tool request
-	 * @return never {@code null} map of arguments
-	 */
-	private Map<String, Object> safeArguments(McpSchema.CallToolRequest callToolRequest) {
-		Map<String, Object> arguments = callToolRequest.arguments();
-		return arguments != null ? arguments : Map.of();
-	}
-
-	/**
-	 * Resolve a string argument from the argument map, applying a default when absent.
-	 * @param arguments argument map
-	 * @param key argument key to extract
-	 * @param defaultValue fallback value when the argument is not supplied
-	 * @return resolved argument value or the default
-	 */
-	private String stringArgument(Map<String, Object> arguments, String key, String defaultValue) {
-		Object value = arguments.get(key);
-		if (value == null) {
-			return defaultValue;
-		}
-		String text = Objects.toString(value, null);
-		return text == null ? defaultValue : text;
-	}
-
-	/**
-	 * Resolve a boolean argument using relaxed parsing rules and a default fallback.
-	 * @param arguments argument map
-	 * @param key argument key to extract
-	 * @param defaultValue fallback value when the argument is not supplied
-	 * @return resolved argument value or the default
-	 */
-	private boolean booleanArgument(Map<String, Object> arguments, String key, boolean defaultValue) {
-		Object value = arguments.get(key);
-		if (value instanceof Boolean bool) {
-			return bool;
-		}
-		if (value instanceof String text) {
-			return Boolean.parseBoolean(text);
-		}
-		return defaultValue;
 	}
 
 	/**
